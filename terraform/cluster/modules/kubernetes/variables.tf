@@ -10,5 +10,9 @@ variable "ssh_user_name" {}
 variable "public_ip_address_name" {}
 variable "dns_label" {}
 variable "kubernetes_version" {}
-# variable "public_ip_id" {}
+variable "public_ip_id" {}
 # variable "public_ip_fqdn" {}
+variable "load_balancer_resource_group" {
+  description = "Resource group where the public IP for LoadBalancer is located"
+  type        = string
+}

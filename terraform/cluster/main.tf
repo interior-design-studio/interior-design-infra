@@ -43,9 +43,10 @@ module "kubernetes" {
   ssh_private_key_file = var.ssh_private_key_file
   ssh_user_name        = var.ssh_user_name
   dns_label            = var.dns_label
-  # public_ip_id         = module.kubernetes.public_ip_id
+  public_ip_id         = module.network.public_ip_id
   public_ip_address_name      = var.public_ip_address_name
-  # public_ip_fqdn       = module.kubernetes.public_ip_fqdn
+  # public_ip_fqdn       = module.network.public_ip_fqdn
+  load_balancer_resource_group = var.resource_group_name
   kubernetes_version   = var.kubernetes_version
 
 }

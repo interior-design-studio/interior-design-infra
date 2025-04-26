@@ -29,6 +29,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
   network_profile {
     network_plugin     = "azure"
     load_balancer_sku  = "standard"
+    load_balancer_profile {
+    managed_outbound_ip_count = 1
+    outbound_ip_address_ids = [var.public_ip_id]
+  }
+  
   }
 
   tags = {
