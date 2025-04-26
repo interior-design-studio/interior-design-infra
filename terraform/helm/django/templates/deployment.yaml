@@ -25,8 +25,8 @@ spec:
               value: {{ .Values.env.DEBUG | quote }}
             - name: SECRET_KEY
               value: {{ .Values.env.SECRET_KEY | quote }}
-            - name: ALLOWED_HOSTS
-              value: {{ .Values.env.ALLOWED_HOSTS | quote }}
+            - name: DJANGO_ALLOWED_HOSTS
+              value: {{ .Values.env.DJANGO_ALLOWED_HOSTS | quote }}
             - name: POSTGRES_DB
               value: {{ .Values.env.POSTGRES_DB | quote }}
             - name: POSTGRES_USER

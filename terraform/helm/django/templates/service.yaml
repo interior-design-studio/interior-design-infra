@@ -9,5 +9,6 @@ spec:
   ports:
     - port: {{ .Values.service.port }}
       targetPort: 8000
+  loadBalancerIP: {{ .Values.service.loadBalancerIP | quote }}
   selector:
     app: {{ include "django-app.name" . }}

@@ -2,22 +2,25 @@ replicaCount: 1
 
 image:
   repository: tavrds/interior-design-studio
-  tag: latest
+  tag: 26041009
   pullPolicy: IfNotPresent
 
 service:
-  type: ClusterIP
-  port: 8000
+  type: LoadBalancer
+  port: 80
+  loadBalancerIP: 51.142.193.179
 
 env:
   DEBUG: "True"
   SECRET_KEY: "supersecretkey"
-  ALLOWED_HOSTS: "*"
+  ALLOWED_HOSTS: "172.166.90.117,51.142.193.179"
   POSTGRES_DB: "interior_db"
   POSTGRES_USER: "interior_user"
   POSTGRES_PASSWORD: "interior_pass"
-  POSTGRES_HOST: "postgres-db"
+  POSTGRES_HOST: "postgres-db-postgresql"
   POSTGRES_PORT: "5432"
+  DJANGO_ALLOWED_HOSTS: "tavrds-5186.uksouth.cloudapp.azure.com,172.166.90.117,51.142.193.179"
+
 
 ingress:
   enabled: true
@@ -25,7 +28,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: tavrds.uksouth.cloudapp.azure.com
+    - host: tavrds-5186.uksouth.cloudapp.azure.com
       paths:
         - path: /
           pathType: Prefix
