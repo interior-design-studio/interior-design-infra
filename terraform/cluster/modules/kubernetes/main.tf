@@ -6,7 +6,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   kubernetes_version  = var.kubernetes_version
 
   # Create node resources in a dedicated node RG to avoid IP conflict
-  node_resource_group = "${var.resource_group_name}-nodes"
+  node_resource_group = "${var.resource_group_name}-node"
 
   linux_profile {
     admin_username = var.ssh_user_name
@@ -27,28 +27,27 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   network_profile {
-    network_plugin     = "azure"
-    load_balancer_sku  = "standard"
-    load_balancer_profile {
-    managed_outbound_ip_count = 1
+  network_plugin    = "azure"
+  load_balancer_sku = "standard"
+
+  load_balancer_profile {
     outbound_ip_address_ids = [var.public_ip_id]
   }
-  
-  }
+}
 
   tags = {
     environment = "dev"
   }
 }
 
-# # Automatically assign "Network Contributor" role to AKS identity
-# # So it can use manually created Public IP in Helm Ingress
+data "azurerm_client_config" "current" {}
+
 # resource "azurerm_role_assignment" "aks_ip_access" {
 #   depends_on = [azurerm_kubernetes_cluster.aks]
 
 #   principal_id         = azurerm_kubernetes_cluster.aks.identity[0].principal_id
 #   role_definition_name = "Network Contributor"
-#   scope                = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+#   scope                = var.public_ip_id
 # }
 
 # # Get current subscription info for use in role assignment

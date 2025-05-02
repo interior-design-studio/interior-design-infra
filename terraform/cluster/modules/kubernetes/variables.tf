@@ -1,5 +1,6 @@
 variable "location" {}
 variable "resource_group_name" {}
+# variable "node_resource_group_name" {}
 variable "vm_size" {}
 variable "aks_name" {}
 variable "aks_dns_prefix" {}
@@ -11,7 +12,7 @@ variable "public_ip_address_name" {}
 variable "dns_label" {}
 variable "kubernetes_version" {}
 variable "public_ip_id" {}
-# variable "public_ip_fqdn" {}
+variable "public_ip_fqdn" {}
 variable "load_balancer_resource_group" {
   description = "Resource group where the public IP for LoadBalancer is located"
   type        = string

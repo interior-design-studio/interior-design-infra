@@ -1,45 +1,15 @@
-resource "helm_release" "postgresql" {
-  # depends_on = [module.kubernetes]
-  name       = "postgresql"
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "postgresql"
-  version    = "12.5.6"
-  namespace  = "default"
-
-  values = [yamlencode({
-    auth = {
-      username = "myuser"
-      password = "mypassword"
-      database = "mydb"
-    }
-
-  })]
-
-  # set {
-  #   name  = "auth.postgresPassword"
-  #   value = "mypassword"
-  # }
-
-  # set {
-  #   name  = "primary.persistence.enabled"
-  #   value = "false"
-  # }
-}
-
 resource "helm_release" "ingress_nginx" {
-  # depends_on = [module.kubernetes]
-  name       = "ingress-nginx"
-  repository = "https://kubernetes.github.io/ingress-nginx"
-  chart      = "ingress-nginx"
-  version    = "4.10.0"
-  namespace  = "ingress-nginx"
+  name             = "ingress-nginx"
+  repository       = "https://kubernetes.github.io/ingress-nginx"
+  chart            = "ingress-nginx"
+  version          = "4.12.1"
+  namespace        = "ingress-nginx"
   create_namespace = true
-
-  # depends_on = [azurerm_public_ip.pip]
+  force_update     = true
 
   set {
     name  = "controller.service.type"
-    value = "LoadBalancer"
+    value = var.CONTROLLER_SERVICE_TYPE
   }
 
   set {
@@ -48,47 +18,91 @@ resource "helm_release" "ingress_nginx" {
   }
 
   set {
-  name  = "controller.service.annotations.service.beta.kubernetes.io/azure-dns-label-name"
-  value = data.terraform_remote_state.cluster.outputs.dns_label
+    name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
+    value = data.terraform_remote_state.cluster.outputs.load_balancer_resource_group
+  }
+
+
+  set {
+    name  = "controller.replicaCount"
+    value = var.CONTROLLER_REPLICA_COUNT
   }
 
   set {
-    name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
-    value = data.terraform_remote_state.cluster.outputs.resource_group_name
+    name  = "controller.nodeSelector.kubernetes\\.io/os"
+    value = var.CONTROLLER_NODE_SELECTOR_OS
   }
+
+  set {
+    name  = "defaultBackend.nodeSelector.kubernetes\\.io/os"
+    value = var.DEFAULT_BACKEND_NODE_SELECTOR_OS
+  }
+  set {
+  name  = "controller.service.externalTrafficPolicy"
+  value = "Local"
+  }
+  #   lifecycle {
+  #   prevent_destroy = true
+  # }
 
 }
 
-# resource "helm_release" "django" {
-#   depends_on = [module.kubernetes.azurerm_kubernetes_cluster.aks]
-#   name       = "nginx"
-#   repository = "https://charts.bitnami.com/bitnami"
-#   chart      = "nginx"
-#   version    = "15.0.2"
-#   namespace  = "default"
-# }
-# depends_on = [azurerm_public_ip.pip]
+resource "helm_release" "postgres" {
+  name       = "postgres"
+  repository = "https://charts.bitnami.com/bitnami"
+  chart      = "postgresql"
+  namespace  = "default"
+  version    = "12.2.5"
+  depends_on = [helm_release.ingress_nginx]
+  set {
+    name  = "auth.username"
+    value = var.POSTGRES_USER
+  }
 
-# set {
-#   name  = "controller.service.loadBalancerIP"
-#   value = module.kubernetes.public_ip_address
-# }
+  set {
+    name  = "auth.password"
+    value = var.POSTGRES_PASSWORD
+  }
+
+  set {
+    name  = "auth.database"
+    value = var.POSTGRES_DB
+  }
+
+  set {
+    name  = "primary.service.port"
+    value = var.POSTGRES_PORT
+  }
+}
+
+resource "helm_release" "frontend" {
+  name             = "frontend"
+  chart            = "${path.module}/frontend"
+  namespace        = "default"
+  create_namespace = false
+
+  values = [file("${path.module}/frontend/values.yaml")]
+
+  depends_on = [helm_release.ingress_nginx]
+}
+
+resource "helm_release" "django_app" {
+  name             = "django-app"
+  chart            = "${path.module}/django"
+  namespace        = "default"
+  create_namespace = false
+
+  depends_on = [helm_release.postgres]
+
   # set {
-  #   name  = "image.repository"
-  #   value = "interior-design-studio/mydjangoapp"
+  #   name  = "env.DJANGO_ALLOWED_HOSTS"
+  #   value = join(",", [
+  #     "localhost",
+  #     "127.0.0.1",
+  #     "0.0.0.0",
+  #     data.terraform_remote_state.cluster.outputs.public_ip_fqdn
+  #   ])
   # }
 
-  # set {
-  #   name  = "image.tag"
-  #   value = "latest"
-  # }
-
-  # set {
-  #   name  = "env[0].name"
-  #   value = "DATABASE_HOST"
-  # }
-
-  # set {
-  #   name  = "env[0].value"
-  #   value = "postgresql.default.svc.cluster.local"
-  # }
+  values = [file("${path.module}/django/values.yaml")]
+}

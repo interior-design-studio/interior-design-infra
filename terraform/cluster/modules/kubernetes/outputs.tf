@@ -30,8 +30,8 @@ output "aks_fqdn" {
 # output "public_ip_address" {
 #   value = azurerm_public_ip.pip.ip_address
 # }
-output "resource_group_name" {
-  value = azurerm_kubernetes_cluster.aks.resource_group_name
+output "load_balancer_resource_group" {
+  value = azurerm_kubernetes_cluster.aks.node_resource_group
 }
 output "kube_config_detailed" {
   description = "Full kube_config from AKS cluster"
