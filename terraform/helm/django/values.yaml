@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: tavrds/interior-design-studio
-  tag: latest
+  tag: 1b99538
   pullPolicy: IfNotPresent
 
 service:
