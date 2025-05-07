@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: tavrds/interior-design-frontend
-  tag: "1.0.0"
+  tag: 6dd0ed2
   pullPolicy: IfNotPresent
 
 service:
