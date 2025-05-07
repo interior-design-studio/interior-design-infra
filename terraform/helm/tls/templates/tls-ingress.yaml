@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tls-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.clusterIssuer }}
+    acme.cert-manager.io/http01-ingress-class: nginx
+spec:
+  rules:
+    - host: {{ .Values.domain }}
+      http:
+        paths:
+          - path: /.well-known/acme-challenge/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.dummyService.name }}
+                port:
+                  number: {{ .Values.dummyService.port }}
+  tls:
+    - hosts:
+        - {{ .Values.domain }}
+      secretName: {{ .Values.secretName }}

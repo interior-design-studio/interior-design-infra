@@ -1,0 +1,10 @@
+domain: tavrds-7177.uksouth.cloudapp.azure.com
+secretName: tls-frontend
+clusterIssuer:
+  name: letsencrypt-prod
+  email: interior.design.studio.projec@gmail.com
+  server: https://acme-v02.api.letsencrypt.org/directory
+  privateKeySecretName: letsencrypt-prod
+dummyService:
+  name: dummy-service
+  port: 80

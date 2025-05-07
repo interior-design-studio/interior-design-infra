@@ -1,0 +1,34 @@
+replicaCount: 1
+
+image:
+  repository: tavrds/interior-design-frontend
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+  hosts:
+  - host: tavrds-7177.uksouth.cloudapp.azure.com
+    paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
+
+  tls:
+    - hosts:
+          - tavrds-7177.uksouth.cloudapp.azure.com
+      secretName: tls-frontend
+

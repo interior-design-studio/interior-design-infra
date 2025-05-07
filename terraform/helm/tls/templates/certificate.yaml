@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-frontend
+  namespace: default
+spec:
+  secretName: tls-frontend
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: tavrds-7177.uksouth.cloudapp.azure.com
+  dnsNames:
+    - tavrds-7177.uksouth.cloudapp.azure.com
+  renewBefore: 360h # 15 days
+  duration: 2160h   # 90 days

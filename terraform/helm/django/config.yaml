@@ -1,0 +1,32 @@
+# replicaCount: 1
+
+# image:
+#   repository: tavrds/interior-design-django
+#   tag: 1.0.4
+#   pullPolicy: IfNotPresent
+
+# service:
+#   type: ClusterIP
+#   port: 80
+
+# env:
+#   DEBUG: "True"
+#   SECRET_KEY: "supersecretkey"
+#   # ALLOWED_HOSTS: "tavrds-7177.uksouth.cloudapp.azure.com/django"
+#   POSTGRES_DB: "postgres"
+#   POSTGRES_USER: "postgres"
+#   POSTGRES_PASSWORD: "3CUD9iCyMT"
+#   POSTGRES_HOST: "postgres-postgresql.default.svc.cluster.local"
+#   POSTGRES_PORT: "5432"
+
+# ingress:
+#   enabled: true
+#   className: nginx
+#   annotations:
+#     kubernetes.io/ingress.class: nginx
+#   hosts:
+#     - host: tavrds-7177.uksouth.cloudapp.azure.com
+#       paths:
+#         - path: /django(/|$)(.*)
+#           pathType: ImplementationSpecific
+#   tls: []
