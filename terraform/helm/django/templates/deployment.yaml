@@ -44,6 +44,8 @@ spec:
               value: {{ .Values.env.POSTGRES_HOST | quote }}
             - name: POSTGRES_PORT
               value: {{ .Values.env.POSTGRES_PORT | quote }}
+            - name: CSRF_TRUSTED_ORIGINS
+              value: {{ .Values.env.CSRF_TRUSTED_ORIGINS | quote }}
           # readinessProbe:
           #   httpGet:
           #     path: /

@@ -1,79 +1,89 @@
-# Interior Design Studio - Infrastructure
+# README.md
 
-## Project Overview
+## Interior Design Studio Infrastructure
 
-This repository contains Infrastructure as Code (IaC) for deploying the Interior Design Studio application to Azure Kubernetes Service (AKS) using Terraform and Helm.
-
-The setup includes:
-- Azure Kubernetes Service (AKS) cluster
-- Static Public IP with DNS Label (FQDN)
-- Ingress NGINX Controller (via Helm)
-- PostgreSQL Database (via Helm)
-- Storage Account for Terraform state and application storage
-
-
-## Project Structure
-
-```
-terraform/
-├── cluster/          # Terraform code for AKS cluster and network
-├── helm/             # Terraform code for Helm releases (Ingress, PostgreSQL)
-```
-
-- `terraform/cluster/`: deploys resource group, public IP, storage account, and AKS cluster.
-- `terraform/helm/`: installs Helm charts for Ingress NGINX and PostgreSQL.
-
-
-## Quick Deployment Steps
-
-### 1. Deploy Cluster Infrastructure
-
-```bash
-cd terraform/cluster
-terraform init
-terraform apply
-```
-
-### 2. Assign AKS access to Public IP
-
-Use Azure Portal or run the provided Bash script to assign the "Network Contributor" role to the AKS managed identity.
-
-### 3. Verify Cluster and Update Kubeconfig
-
-```bash
-az aks get-credentials --resource-group interior-design-studio-dev --name aksname --overwrite-existing
-kubectl get nodes
-```
-
-### 4. Deploy Helm Releases
-
-```bash
-cd ../helm
-terraform init
-terraform apply
-```
-
-### 5. Access the Application
-
-Visit your FQDN address:
-
-```
-http://tavrds.uksouth.cloudapp.azure.com
-```
-
-
-## Important Notes
-
-- Static Public IP is pre-created and assigned during AKS cluster provisioning.
-- Ingress Controller deployment may initially show `FAILED` status if Azure Load Balancer delays IP assignment; this will self-correct.
-- PostgreSQL database is installed internally within the Kubernetes cluster.
-
-
-## Authors
-
-- Victoria Otrok
+This repository contains the infrastructure-as-code setup for deploying the Interior Design Studio web application using **Terraform**, **Azure Kubernetes Service (AKS)**, and **Helm**. It manages both backend (Django), frontend (SPA), and TLS certificate provisioning with Let's Encrypt.
 
 ---
 
-> For detailed step-by-step deployment instructions, see `INSTRUCTION.md`.
+## ⚙️ Technologies Used
 
+* **Azure AKS** — managed Kubernetes cluster
+* **Terraform** — infrastructure provisioning
+* **Helm** — templated application deployment
+* **NGINX Ingress Controller** — traffic routing
+* **cert-manager** — TLS certificate automation
+* **Let's Encrypt** — ACME certificate authority
+* **GitHub Actions** — CI/CD pipelines
+
+---
+
+## 📂 Repository Structure
+
+```
+terraform/
+  cluster/                 # AKS + networking modules
+  helm/
+    django/               # backend Helm chart
+    frontend/             # frontend Helm chart
+    tls/                  # Ingress + cert-manager + Certificate
+    dummy/                # dummy service for ACME HTTP challenge
+```
+
+---
+
+## 🔒 TLS / HTTPS Configuration
+
+TLS is handled via **cert-manager** and Let's Encrypt with an automated `ClusterIssuer` and `Certificate`:
+
+* `tls-ingress` chart provisions an Ingress for the ACME HTTP-01 challenge.
+* A `dummy` service is deployed to respond to challenge requests.
+* All main Ingress objects (frontend, backend) use a single `tls-frontend` secret.
+
+---
+
+## 🚀 CI/CD: Frontend Pipeline
+
+The frontend application is automatically built and deployed using GitHub Actions:
+
+* On push to `develop` in `app/frontend/`:
+
+  * Docker image is built using `Dockerfile`
+  * Image is pushed to DockerHub with `GITHUB_SHA` as tag
+  * PR is created in a **forked infra repo** (`interior-design-infra-*`)
+
+    * The PR updates `values.yaml` in the frontend Helm chart with the new image tag
+
+---
+
+## 🔧 Deployment Instructions
+
+1. Provision infrastructure:
+
+   ```bash
+   terraform -chdir=terraform/cluster init
+   terraform -chdir=terraform/cluster apply
+   ```
+
+2. Deploy Helm charts:
+
+   ```bash
+   terraform -chdir=terraform/helm apply
+   ```
+
+---
+
+## 🌐 Ingress Domain
+
+The application is served over HTTPS using the domain:
+
+```
+tavrds-7177.uksouth.cloudapp.azure.com
+```
+
+---
+
+## 🎓 Authors
+
+* Infrastructure: [Viktoria Otrok](https://github.com/88victory88)
+* Based on Azure AKS + Terraform architecture best practices

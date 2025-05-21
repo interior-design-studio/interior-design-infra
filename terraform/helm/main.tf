@@ -47,33 +47,40 @@ resource "helm_release" "ingress_nginx" {
 
 }
 
-resource "helm_release" "postgres" {
-  name       = "postgres"
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "postgresql"
+resource "helm_release" "custom_postgres" {
+  name       = "custom-postgres"
+  chart      = "${path.module}/postgres-custom"
   namespace  = "default"
-  version    = "12.2.5"
-  depends_on = [helm_release.ingress_nginx]
-  set {
-    name  = "auth.username"
-    value = var.POSTGRES_USER
-  }
-
-  set {
-    name  = "auth.password"
-    value = var.POSTGRES_PASSWORD
-  }
-
-  set {
-    name  = "auth.database"
-    value = var.POSTGRES_DB
-  }
-
-  set {
-    name  = "primary.service.port"
-    value = var.POSTGRES_PORT
-  }
+  values     = [file("${path.module}/postgres-custom/values.yaml")]
 }
+
+# resource "helm_release" "postgres" {
+#   name       = "postgres"
+#   repository = "https://charts.bitnami.com/bitnami"
+#   chart      = "postgresql"
+#   namespace  = "default"
+#   version    = "12.2.5"
+#   depends_on = [helm_release.ingress_nginx]
+#   set {
+#     name  = "auth.username"
+#     value = var.POSTGRES_USER
+#   }
+
+#   set {
+#     name  = "auth.password"
+#     value = var.POSTGRES_PASSWORD
+#   }
+
+#   set {
+#     name  = "auth.database"
+#     value = var.POSTGRES_DB
+#   }
+
+#   set {
+#     name  = "primary.service.port"
+#     value = var.POSTGRES_PORT
+#   }
+# }
 
 resource "helm_release" "frontend" {
   name             = "frontend"
@@ -92,7 +99,7 @@ resource "helm_release" "django_app" {
   namespace        = "default"
   create_namespace = false
 
-  depends_on = [helm_release.postgres]
+  depends_on = [helm_release.custom_postgres]
 
   # set {
   #   name  = "env.DJANGO_ALLOWED_HOSTS"
@@ -105,4 +112,59 @@ resource "helm_release" "django_app" {
   # }
 
   values = [file("${path.module}/django/values.yaml")]
+}
+
+resource "helm_release" "dummy" {
+  name             = "dummy-service"
+  chart            = "${path.module}/dummy"
+  namespace        = "default"
+  create_namespace = false
+}
+
+resource "helm_release" "tls_ingress" {
+  name             = "tls-ingress"
+  chart            = "${path.module}/tls"
+  namespace        = "default"
+  create_namespace = false
+
+  depends_on = [
+    helm_release.dummy
+  ]
+}
+
+# resource "helm_release" "monitoring" {
+#   name             = "prometheus"
+#   namespace        = "default"
+#   create_namespace = false
+
+#   repository       = "https://prometheus-community.github.io/helm-charts"
+#   chart            = "kube-prometheus-stack"
+#   version          = "71.2.0"
+
+#   values = [
+#     file("${path.module}/monitoring/values.yaml")
+#   ]
+# }
+
+resource "helm_release" "redis" {
+  name       = "redis"
+  repository = "https://charts.bitnami.com/bitnami"
+  chart      = "redis"
+  version    = "18.5.0"
+  namespace  = "default"
+
+  values = [
+    <<EOF
+auth:
+  enabled: false
+EOF
+  ]
+}
+
+resource "helm_release" "celery" {
+  name       = "celery"
+  chart      = "./celery"
+  namespace  = "default"
+  values     = [file("${path.module}/celery/values.yaml")]
+  depends_on = [helm_release.redis]
 }
