@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: tavrds/interior-design-django
-  tag: ab3c7d2
+  tag: 83a730e
   pullPolicy: IfNotPresent
 
 service:
