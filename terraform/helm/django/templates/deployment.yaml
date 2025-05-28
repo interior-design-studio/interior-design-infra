@@ -20,45 +20,66 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 8000
-          # envFrom:
-          #   - secretRef:
-          #       name: postgres-postgresql
           env:
             - name: DEBUG
               value: {{ .Values.env.DEBUG | quote }}
             - name: SECRET_KEY
               value: {{ .Values.env.SECRET_KEY | quote }}
-            # - name: ALLOWED_HOSTS
-            #   value: {{ .Values.env.DJANGO_ALLOWED_HOSTS | quote }}
-            - name: DJANGO_ALLOWED_HOSTS
-              value: {{ .Values.env.DJANGO_ALLOWED_HOSTS | quote }}
+
+            - name: ALLOWED_HOSTS
+              value: {{ .Values.env.ALLOWED_HOSTS | quote }}
+
             - name: FORCE_SCRIPT_NAME
               value: {{ .Values.env.FORCE_SCRIPT_NAME | quote }}
-            - name: POSTGRES_DB
-              value: {{ .Values.env.POSTGRES_DB | quote }}
+
+            - name: STATIC_URL
+              value: {{ .Values.env.STATIC_URL | quote }}
+
+            - name: CSRF_TRUSTED_ORIGINS
+              value: {{ .Values.env.CSRF_TRUSTED_ORIGINS | quote }}
+
+            - name: CORS_ALLOWED_ORIGINS
+              value: {{ .Values.env.CORS_ALLOWED_ORIGINS | quote }}
+
+            - name: CORS_ALLOW_CREDENTIALS
+              value: {{ .Values.env.CORS_ALLOW_CREDENTIALS | quote }}
+
+            - name: HTTPS
+              value: {{ .Values.env.HTTPS | quote }}
+
+            - name: SECURE_HSTS_SECONDS
+              value: {{ .Values.env.SECURE_HSTS_SECONDS | quote }}
+
+            - name: USE_X_FORWARDED_HOST
+              value: {{ .Values.env.USE_X_FORWARDED_HOST | quote }}
+
+            - name: EMAIL_HOST_USER
+              value: {{ .Values.env.EMAIL_HOST_USER | quote }}
+            - name: EMAIL_HOST_PASSWORD
+              value: {{ .Values.env.EMAIL_HOST_PASSWORD | quote }}
+            - name: EMAIL_HOST
+              value: {{ .Values.env.EMAIL_HOST | quote }}
+            - name: EMAIL_PORT
+              value: {{ .Values.env.EMAIL_PORT | quote }}
+            - name: ADMIN_NOTIFICATION_EMAIL
+              value: {{ .Values.env.ADMIN_NOTIFICATION_EMAIL | quote }}
+
             - name: POSTGRES_USER
               value: {{ .Values.env.POSTGRES_USER | quote }}
             - name: POSTGRES_PASSWORD
               value: {{ .Values.env.POSTGRES_PASSWORD | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.env.POSTGRES_DB | quote }}
             - name: POSTGRES_HOST
               value: {{ .Values.env.POSTGRES_HOST | quote }}
             - name: POSTGRES_PORT
               value: {{ .Values.env.POSTGRES_PORT | quote }}
-            - name: CSRF_TRUSTED_ORIGINS
-              value: {{ .Values.env.CSRF_TRUSTED_ORIGINS | quote }}
-          # readinessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: 8000
-          #   initialDelaySeconds: 10
-          #   periodSeconds: 5
-          #   timeoutSeconds: 3
-          #   failureThreshold: 6
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: 8000
-          #   initialDelaySeconds: 15
-          #   periodSeconds: 10
-          #   timeoutSeconds: 5
-          #   failureThreshold: 6
+            - name: PGDATA
+              value: {{ .Values.env.PGDATA | quote }}
+
+            - name: CELERY_BROKER_URL
+              value: {{ .Values.env.CELERY_BROKER_URL | quote }}
+            - name: CELERY_RESULT_BACKEND
+              value: {{ .Values.env.CELERY_RESULT_BACKEND | quote }}
+
+

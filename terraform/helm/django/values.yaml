@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: tavrds/interior-design-django
-  tag: 1.0.5
+  tag: 3da1be4
   pullPolicy: IfNotPresent
 
 service:
@@ -12,16 +12,36 @@ service:
 
 env:
   DEBUG: "True"
-  SECRET_KEY: "supersecretkey"
-  # ALLOWED_HOSTS: "*"
-  POSTGRES_DB: "designStudioDB"
+  SECRET_KEY: "t%s*m9c-&!2o)2h4%6mal7x53=da)t)(&-h4ffrn$a5hjklocy"
+  ALLOWED_HOSTS: "tavrds-7177.uksouth.cloudapp.azure.com"
+  # DJANGO_ALLOWED_HOSTS: "tavrds-7177.uksouth.cloudapp.azure.com"
+  FORCE_SCRIPT_NAME: "/django/"
+  STATIC_URL: "/django/static/"
+
+  CSRF_TRUSTED_ORIGINS: "https://tavrds-7177.uksouth.cloudapp.azure.com"
+
+  CORS_ALLOWED_ORIGINS: "https://tavrds-7177.uksouth.cloudapp.azure.com"
+  CORS_ALLOW_CREDENTIALS: "True"
+
+  HTTPS: "True"
+  SECURE_HSTS_SECONDS: "3600"
+  USE_X_FORWARDED_HOST: "True"
+
+  EMAIL_HOST_USER: "notifications.assistant.v1@gmail.com"
+  EMAIL_HOST_PASSWORD: "twcs bcjd kaoy ybec"
+  EMAIL_HOST: "smtp.gmail.com"
+  EMAIL_PORT: "587"
+  ADMIN_NOTIFICATION_EMAIL: "danilsivkovic@gmail.com"
+
   POSTGRES_USER: "designStudio"
   POSTGRES_PASSWORD: "eyciqj9ipyjs7"
+  POSTGRES_DB: "designStudioDB"
   POSTGRES_HOST: "custom-postgres.default.svc.cluster.local"
   POSTGRES_PORT: "5432"
-  FORCE_SCRIPT_NAME: "/django"
-  DJANGO_ALLOWED_HOSTS: "*"
-  CSRF_TRUSTED_ORIGINS: "https://tavrds-7177.uksouth.cloudapp.azure.com"
+  PGDATA: "/var/lib/postgresql/data"
+
+  CELERY_BROKER_URL: redis://redis-master.default.svc.cluster.local:6379/0
+  CELERY_RESULT_BACKEND: redis://redis-master.default.svc.cluster.local:6379/0
 
 
 ingress:
@@ -31,6 +51,7 @@ ingress:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
 
   hosts:
     - host: tavrds-7177.uksouth.cloudapp.azure.com
